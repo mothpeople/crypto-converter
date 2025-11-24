@@ -95,14 +95,16 @@ export default function App() {
   };
 
   return (
-    // OUTER CONTAINER: Handles the "Mobile Full Screen" vs "Desktop Card" logic
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center font-sans sm:p-4">
+    // OUTER CONTAINER: 
+    // - On Mobile: Just a wrapper, no flex centering.
+    // - On Tablet/Desktop (md:): Uses flex to center the card.
+    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row md:items-center md:justify-center font-sans">
       
       {/* APP CONTAINER: 
-          - On Mobile: w-full h-screen rounded-none (fills screen perfectly)
-          - On Desktop (sm:): max-w-md h-auto rounded-3xl (looks like a card)
+          - Mobile (Default): w-full h-screen (Takes up entire screen). No rounded corners.
+          - Tablet/Desktop (md:): max-w-md h-auto rounded-3xl (Becomes a card).
       */}
-      <div className="w-full h-screen sm:h-auto sm:max-w-md bg-white sm:rounded-3xl sm:shadow-2xl overflow-hidden relative border-gray-100 flex flex-col">
+      <div className="w-full h-screen md:h-auto md:max-w-md bg-white md:rounded-3xl md:shadow-2xl overflow-hidden relative border-gray-100 flex flex-col">
         
         {/* Header */}
         <div className="absolute top-0 left-0 w-full p-4 pt-6 flex justify-between items-center z-10">
@@ -119,8 +121,8 @@ export default function App() {
           </button>
         </div>
 
-        {/* TOP HALF: FIAT (Input) - Flex-1 ensures it takes available space */}
-        <div className="flex-1 bg-gradient-to-br from-indigo-50 to-blue-50 p-8 pt-20 flex flex-col justify-center relative">
+        {/* TOP HALF: FIAT (Input) */}
+        <div className="flex-1 bg-gradient-to-br from-indigo-50 to-blue-50 p-8 pt-24 pb-12 flex flex-col justify-center relative">
           <label className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">You Pay</label>
           
           <div className="flex items-end justify-between gap-4 mb-2">
@@ -154,7 +156,7 @@ export default function App() {
             <span>{fiatCurrency.flag} {fiatCurrency.name}</span>
           </div>
 
-          {/* DIVIDER - Anchored to bottom of this section */}
+          {/* DIVIDER */}
           <div className="absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2 z-20">
             <div className="bg-white p-2 rounded-full shadow-lg border-4 border-gray-50 text-indigo-600">
               <ArrowDown size={20} strokeWidth={2.5} />
@@ -162,7 +164,7 @@ export default function App() {
           </div>
         </div>
 
-        {/* BOTTOM HALF: CRYPTO (Output) - Flex-1 to fill remaining screen */}
+        {/* BOTTOM HALF: CRYPTO (Output) */}
         <div className="flex-1 bg-indigo-950 p-8 pt-16 text-white flex flex-col justify-between">
           
           <div>
