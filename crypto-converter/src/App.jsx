@@ -39,7 +39,6 @@ export default function App() {
     setLoading(true);
     setError(null);
     try {
-      // Fetching top 120 to ensure we have 80 left after filtering stablecoins
       const response = await fetch(
         `https://api.coingecko.com/api/v3/coins/markets?vs_currency=${fiatCurrency.code.toLowerCase()}&order=market_cap_desc&per_page=120&page=1&sparkline=false`
       );
@@ -50,18 +49,15 @@ export default function App() {
 
       const data = await response.json();
 
-      // Filter out stablecoins
       const filteredData = data
         .filter((coin) => !STABLECOINS.includes(coin.id))
         .slice(0, 80);
 
       setCryptos(filteredData);
       
-      // If no crypto is currently selected, or the selected one isn't in the new list (rare), default to BTC
       if (!selectedCrypto && filteredData.length > 0) {
         setSelectedCrypto(filteredData[0]);
       } else if (selectedCrypto) {
-        // Update the price of the currently selected crypto with the new data
         const updatedCrypto = filteredData.find(c => c.id === selectedCrypto.id);
         if (updatedCrypto) setSelectedCrypto(updatedCrypto);
       }
@@ -74,24 +70,17 @@ export default function App() {
     }
   };
 
-  // Re-fetch when fiat currency changes
   useEffect(() => {
     fetchData();
   }, [fiatCurrency]);
-
-  const handleSwap = () => {
-    // Just a visual function since flow is strict Fiat -> Crypto
-  };
 
   const calculateConversion = () => {
     if (!fiatAmount || !selectedCrypto) return '0.00';
     const amount = parseFloat(fiatAmount.replace(/,/g, ''));
     if (isNaN(amount)) return '0.00';
     
-    // Calculate crypto amount: Fiat / Price
     const value = amount / selectedCrypto.current_price;
     
-    // Smart formatting for decimals based on value size
     if (value < 0.00001) return value.toFixed(8);
     if (value < 0.01) return value.toFixed(6);
     if (value < 1) return value.toFixed(4);
@@ -100,20 +89,23 @@ export default function App() {
 
   const handleFiatAmountChange = (e) => {
     const val = e.target.value;
-    // Allow only numbers and one decimal
     if (val === '' || /^\d*\.?\d*$/.test(val)) {
       setFiatAmount(val);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center font-sans p-4">
+    // OUTER CONTAINER: Handles the "Mobile Full Screen" vs "Desktop Card" logic
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center font-sans sm:p-4">
       
-      {/* Main Card Container */}
-      <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden relative border border-gray-100">
+      {/* APP CONTAINER: 
+          - On Mobile: w-full h-screen rounded-none (fills screen perfectly)
+          - On Desktop (sm:): max-w-md h-auto rounded-3xl (looks like a card)
+      */}
+      <div className="w-full h-screen sm:h-auto sm:max-w-md bg-white sm:rounded-3xl sm:shadow-2xl overflow-hidden relative border-gray-100 flex flex-col">
         
-        {/* Header - Absolute to float over */}
-        <div className="absolute top-0 left-0 w-full p-4 flex justify-between items-center z-10">
+        {/* Header */}
+        <div className="absolute top-0 left-0 w-full p-4 pt-6 flex justify-between items-center z-10">
           <div className="flex items-center gap-2 text-gray-600 bg-white/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-semibold shadow-sm">
             <TrendingUp size={14} />
             <span>Live Rates</span>
@@ -127,8 +119,8 @@ export default function App() {
           </button>
         </div>
 
-        {/* TOP HALF: FIAT (Input) */}
-        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 p-8 pt-16 pb-12 flex flex-col justify-center relative">
+        {/* TOP HALF: FIAT (Input) - Flex-1 ensures it takes available space */}
+        <div className="flex-1 bg-gradient-to-br from-indigo-50 to-blue-50 p-8 pt-20 flex flex-col justify-center relative">
           <label className="text-xs font-bold text-indigo-400 uppercase tracking-wider mb-2">You Pay</label>
           
           <div className="flex items-end justify-between gap-4 mb-2">
@@ -162,7 +154,7 @@ export default function App() {
             <span>{fiatCurrency.flag} {fiatCurrency.name}</span>
           </div>
 
-          {/* DIVIDER / CONNECTOR - Anchored to bottom of top section */}
+          {/* DIVIDER - Anchored to bottom of this section */}
           <div className="absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2 z-20">
             <div className="bg-white p-2 rounded-full shadow-lg border-4 border-gray-50 text-indigo-600">
               <ArrowDown size={20} strokeWidth={2.5} />
@@ -170,8 +162,8 @@ export default function App() {
           </div>
         </div>
 
-        {/* BOTTOM HALF: CRYPTO (Output) */}
-        <div className="bg-indigo-950 p-8 pb-10 pt-16 text-white min-h-[340px] flex flex-col justify-between">
+        {/* BOTTOM HALF: CRYPTO (Output) - Flex-1 to fill remaining screen */}
+        <div className="flex-1 bg-indigo-950 p-8 pt-16 text-white flex flex-col justify-between">
           
           <div>
             <label className="text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2 block">You Receive</label>
@@ -197,7 +189,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Crypto Selector */}
                 <div className="relative">
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
                     {selectedCrypto?.image ? (
@@ -227,7 +218,6 @@ export default function App() {
                   </div>
                 </div>
 
-                {/* Market Info */}
                 {selectedCrypto && (
                   <div className="mt-6 flex items-center justify-between text-xs font-medium text-indigo-300 bg-indigo-900/30 p-3 rounded-xl border border-indigo-800/50">
                     <div className="flex items-center gap-1">
@@ -243,8 +233,7 @@ export default function App() {
             )}
           </div>
 
-          {/* Footer Info */}
-          <div className="text-center">
+          <div className="text-center mt-4">
              <p className="text-[10px] text-indigo-400/60">
                 {lastUpdated ? `Rates updated: ${lastUpdated.toLocaleTimeString()}` : 'Connecting to market...'}
              </p>
