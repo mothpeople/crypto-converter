@@ -3,7 +3,7 @@
   "name": "Fiat to Crypto Converter",
   "icons": [
     {
-      "src": "logo192.png",
+      "src": "app-icon.png",
       "type": "image/png",
       "sizes": "192x192"
     },
@@ -19,3 +19,4 @@
   "background_color": "#1e1b4b",
   "orientation": "portrait"
 }
+
